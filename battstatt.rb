@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby -wKU
 res = Array.new
-res = %x(/usr/sbin/ioreg -p IODeviceTree -n "battery" -w 0).grep(/Battery/)[0].match(/\{(.*)\}/)[1].split(',')
+begin
+  res = %x(/usr/sbin/ioreg -p IODeviceTree -n "battery" -w 0).grep(/Battery/)[0].match(/\{(.*)\}/)[1].split(',')
+rescue
+  puts "Unsupported system."
+  exit(1)
+end
+  
 stats = Hash.new
 
 res.each do |d| 
