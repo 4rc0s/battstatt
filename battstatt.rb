@@ -27,3 +27,5 @@ puts
 stats.each { |k, v| puts "#{k} => #{v}" }
 percentOfOriginal = (stats[:MaxCapacity].to_f / stats[:DesignCapacity].to_f) * 100
 puts "Battery capacity is currently #{sprintf("%.2f", percentOfOriginal)}% of original."
+amps = (stats[:Amperage].to_i + 2**15) % 2**16 - 2**15 # convert to signed 16-bit integer 
+puts "Amperage is #{amps} mA."
