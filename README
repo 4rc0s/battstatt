@@ -1,5 +1,2 @@
-This little program works on my old PowerBook G4 to output certain battery stats.
-
-Anyone know how to read this info on a newer machine? I know for a fact it doesn't work on my new Alu MacBook.
-
--Geoff
+A little program to display battery status on OS X Lion. Calculates battery capacity as a percentage
+of total design capacity.
