@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 res = Array.new
 begin
   rawstring = %x(/usr/sbin/ioreg -l | grep -i 'AppleSmartBattery ' -A 38)
@@ -18,6 +18,7 @@ res.each do |d|
   end
   stats[:"#{key}"] = val
 end
+stats.reject! { |k, v| k =~ /^\|.*/ }
 
 puts
 puts "-------------------------------"
