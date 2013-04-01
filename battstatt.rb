@@ -1,8 +1,8 @@
-#!/usr/bin/env ruby -wKU
+#!/usr/bin/env ruby
 res = Array.new
 begin
-  rawstring = %x(/usr/sbin/ioreg -l | grep -i 'AppleSmartBattery ' -A 36)
-  res = rawstring.to_a[2..-2]
+  rawstring = %x(/usr/sbin/ioreg -l | grep -i 'AppleSmartBattery ' -A 38)
+  res = rawstring.split(/\n/).reject(&:empty?)
 rescue
   puts "Unsupported system."
   exit(1)
