@@ -27,6 +27,7 @@ end
 SKIP_KEYS = [
   'AbsoluteCapacity',
   'AppleRawAdapterDetails',
+  'PackReserve',
   'CarrierMode',
   'ChargerConfiguration',
   'IOGeneralInterest',
