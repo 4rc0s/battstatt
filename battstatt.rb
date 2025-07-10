@@ -95,7 +95,7 @@ stats.sort.to_h.each do |k, v|
   elsif ['TimeRemaining', 'AvgTimeToEmpty', 'AvgTimeToFull'].include?(k)
     minutes = v.to_i
     if minutes == 65535
-      display_v = "Not Charging"
+      display_v = "N/A"
     elsif minutes > 0
       hours = minutes / 60
       remaining_minutes = minutes % 60
