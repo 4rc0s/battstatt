@@ -1,2 +1,2 @@
-A little program to display battery status on OS X Lion. Calculates battery capacity as a percentage
+A little ruby script to display battery status on macOS. Calculates battery capacity as a percentage
 of total design capacity.
