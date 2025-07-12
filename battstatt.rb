@@ -17,7 +17,7 @@ OptionParser.new do |opts|
   end
 
   opts.on("--version", "Show version information") do
-    puts "battstatt.rb 1.0.0"
+    puts "battstatt.rb 1.1.0"
     puts "Ruby: #{RUBY_DESCRIPTION}"
     puts "Path: #{RbConfig.ruby}"
     exit
