@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -w
 
 require 'optparse'
+require 'rbconfig'
 
 # Default options
 options = {
@@ -18,6 +19,7 @@ OptionParser.new do |opts|
   opts.on("--version", "Show version information") do
     puts "battstatt.rb 1.0.0"
     puts "Ruby: #{RUBY_DESCRIPTION}"
+    puts "Path: #{RbConfig.ruby}"
     exit
   end
 end.parse!
