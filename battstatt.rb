@@ -1,7 +1,22 @@
 #!/usr/bin/env ruby -w
 
-# Execute ioreg to get battery details. The -r flag provides a more stable,
-# non-XML output that is easier to parse reliably.
+require 'optparse'
+
+# Default options
+options = {
+  verbose: false
+}
+
+# Parse command-line arguments
+OptionParser.new do |opts|
+  opts.banner = "Usage: battstatt.rb [options]"
+
+  opts.on("-v", "--verbose", "Print detailed battery information") do |v|
+    options[:verbose] = v
+  end
+end.parse!
+
+# Execute ioreg to get battery details
 begin
   ioreg_output = %x(/usr/sbin/ioreg -r -c AppleSmartBattery)
   if ioreg_output.empty?
@@ -14,16 +29,24 @@ rescue
 end
 
 stats = {}
-# This regex is designed to parse the key-value structure of the ioreg output,
-# including nested data structures like "BatteryData" = {...}
 ioreg_output.scan(/"([^"]+)" = ([^\n]+)/).each do |match|
   key = match[0]
   value = match[1].strip
   stats[key] = value
 end
 
-# Define a list of keys to skip in the detailed output because they are
-# too verbose or not relevant for a quick summary.
+# Define keys for the default, non-verbose output
+DEFAULT_KEYS = [
+  'CurrentCapacity',
+  'CycleCount',
+  'IsCharging',
+  'TimeRemaining',
+  'AvgTimeToFull',
+  'Amperage',
+  'Temperature'
+]
+
+# Keys to always skip, even in verbose mode
 SKIP_KEYS = [
   'AbsoluteCapacity',
   'AppleRawAdapterDetails',
@@ -34,7 +57,7 @@ SKIP_KEYS = [
   'IOReportLegend',
   'UpdateTime',
   'BootVoltage',
-  'BatteryData', # Parsed for summary, but too verbose to print raw.
+  'BatteryData',
   'KioskMode',
   'DeadBatteryBootData',
   'ManufacturerData',
@@ -47,7 +70,10 @@ SKIP_KEYS = [
   'PortControllerInfo',
   'UserVisiblePathUpdated',
   'IOReportLegendPublic',
-  'AdapterDetails'
+  'AdapterDetails',
+  'BatteryInstalled',
+  'Location',
+  'built-in'
 ]
 
 puts
@@ -56,16 +82,16 @@ puts "         Battery Stats"
 puts "-------------------------------"
 puts
 
-# Print all the gathered stats in a clean, readable format,
-# skipping the keys defined in SKIP_KEYS.
+# Determine which keys to display based on the verbose flag
+keys_to_display = options[:verbose] ? stats.keys.sort : DEFAULT_KEYS
+
 stats.sort.to_h.each do |k, v|
   next if SKIP_KEYS.include?(k)
+  next unless keys_to_display.include?(k)
 
   display_v = ""
-  # Special handling for amperage fields to make them human-readable.
   if ['Amperage', 'InstantAmperage'].include?(k)
     amperage_val = v.to_i
-    # Convert 64-bit unsigned to signed.
     if amperage_val > 2**63 - 1
       amps = amperage_val - 2**64
     else
@@ -79,7 +105,6 @@ stats.sort.to_h.each do |k, v|
     celsius = v.to_f / 100.0
     display_v = "#{sprintf("%.2f", celsius)} °C"
   elsif k.include?('Capacity')
-    # Handle percentage vs. mAh units for different capacity fields.
     if ['CurrentCapacity', 'MaxCapacity', 'AbsoluteCapacity'].include?(k)
       display_v = "#{v} %"
     else
@@ -104,8 +129,6 @@ stats.sort.to_h.each do |k, v|
       display_v = "0m"
     end
   else
-    # Clean up the value for better display.
-    # Remove surrounding quotes from strings and braces from dictionaries.
     display_v = v.gsub(/^"|"$/, '').gsub(/^{|}$/, '')
   end
   puts "#{k} => #{display_v}"
@@ -114,8 +137,6 @@ end
 puts
 
 # --- Summary Calculations ---
-
-# Extract DesignCapacity from the nested BatteryData string.
 battery_data_str = stats['BatteryData']
 design_capacity = nil
 if battery_data_str
