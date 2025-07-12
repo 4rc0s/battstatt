@@ -14,6 +14,12 @@ OptionParser.new do |opts|
   opts.on("-v", "--verbose", "Print detailed battery information") do |v|
     options[:verbose] = v
   end
+
+  opts.on("--version", "Show version information") do
+    puts "battstatt.rb 1.0.0"
+    puts "Ruby: #{RUBY_DESCRIPTION}"
+    exit
+  end
 end.parse!
 
 # Execute ioreg to get battery details
